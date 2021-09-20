@@ -54,13 +54,15 @@ from .base import Generator
 
 
 class BatchedLinkGenerator(Generator):
+   
+    GG=None
+    
     def __init__(self, G, batch_size, schema=None, use_node_features=True):
         if not isinstance(G, StellarGraph):
             raise TypeError("Graph must be a StellarGraph or StellarDiGraph object.")
-        
-       
+               
         self.graph = G
-        GG = G
+        self.__class__.GG=G
         self.batch_size = batch_size
 
         # This is a link generator and requries a model with two root nodes per query
@@ -123,6 +125,8 @@ class BatchedLinkGenerator(Generator):
             and ``predict``
 
         """
+        
+               
         if self.head_node_types is not None:
             expected_src_type = self.head_node_types[0]
             expected_dst_type = self.head_node_types[1]
