@@ -27,6 +27,7 @@ __all__ = [
     "DirectedGraphSAGELinkGenerator",
 ]
 
+import copy
 import multiprocess as mp
 import random
 import operator
@@ -59,6 +60,7 @@ class BatchedLinkGenerator(Generator):
         
        
         self.graph = G
+        GG = G
         self.batch_size = batch_size
 
         # This is a link generator and requries a model with two root nodes per query
@@ -159,17 +161,15 @@ class BatchedLinkGenerator(Generator):
                     )
 
     #        link_ids = [self.graph.node_ids_to_ilocs(ids) for ids in link_ids]
-        
-            para_list=[]
-            for i in np.arange(len(link_ids)):
-                para_list.append((self.graph, link_ids[i]))
-                
+                      
             pool = mp.Pool(mp.cpu_count())
 
-            link_ids = pool.map(BatchedLinkGenerator.run, para_list)
+            link_ids = pool.map(BatchedLinkGenerator.run, link_ids)
 
             pool.close()
-
+            
+         #   self.graph = BatchedLinkGenerator.GG
+            
             return LinkSequence(
                 self.sample_features,
                 self.batch_size,
@@ -186,9 +186,10 @@ class BatchedLinkGenerator(Generator):
             )
 
     @staticmethod        
-    def run(a, b):
-        return a.node_ids_to_ilocs(b)
-    
+    def run(b):
+        return BatchedLinkGenerator.GG.node_ids_to_ilocs(b)
+
+        
     def flow_from_dataframe(self, link_targets, shuffle=False):
         """
         Creates a generator/sequence object for training or evaluation
