@@ -62,7 +62,6 @@ class BatchedLinkGenerator(Generator):
             raise TypeError("Graph must be a StellarGraph or StellarDiGraph object.")
                
         self.graph = G
-        GG=G
         self.batch_size = batch_size
 
         # This is a link generator and requries a model with two root nodes per query
@@ -166,7 +165,7 @@ class BatchedLinkGenerator(Generator):
 
     #        link_ids = [self.graph.node_ids_to_ilocs(ids) for ids in link_ids]
                       
-            self.__class__.GG=self.graph
+            GG=self.graph
             
             pool = mp.Pool(mp.cpu_count())
 
@@ -174,7 +173,7 @@ class BatchedLinkGenerator(Generator):
 
             pool.close()
             
-            self.graph = self.__class__.GG
+            self.graph = GG
             
             return LinkSequence(
                 self.sample_features,
@@ -191,9 +190,9 @@ class BatchedLinkGenerator(Generator):
                 "Please pass a list of samples or a UnsupervisedSampler object."
             )
 
-    @staticmethod
-    def run(b):
-        return self.__class__.GG.node_ids_to_ilocs(b)
+    @classmethod
+    def run(cls, b):
+        return cls.GG.node_ids_to_ilocs(b)
         
     def flow_from_dataframe(self, link_targets, shuffle=False):
         """
