@@ -163,34 +163,34 @@ class BatchedLinkGenerator(Generator):
                         f"Node pair ({src}, {dst}) not of expected type ({expected_src_type}, {expected_dst_type})"
                     )
 
-    #        link_ids = [self.graph.node_ids_to_ilocs(ids) for ids in link_ids]
+            link_ids = [self.graph.node_ids_to_ilocs(ids) for ids in link_ids]
                       
-            GG=self.graph
+ #           GG=self.graph
             
-            pool = mp.Pool(2)
-            link_ids_result=[]
+ #           pool = mp.Pool(2)
+ #           link_ids_result=[]
             
-            for i in range(0,2, 2):
+ #           for i in range(0,2, 2):
                 
-                if (i+2)<len(link_ids):
-                    sub_list=link_ids[i: (i+2)]
-                else:
-                    sub_list=link_ids[i: len(link_ids)]
+ #               if (i+2)<len(link_ids):
+ #                   sub_list=link_ids[i: (i+2)]
+ #               else:
+ #                   sub_list=link_ids[i: len(link_ids)]
                 
-                run_list=[]
-                for item in sub_list:
-                   run_list.append((1, 1))
+ #               run_list=[]
+ #               for item in sub_list:
+ #                  run_list.append((1, 1))
                     
-                link_ids_result.append(pool.apply(BatchedLinkGenerator.run, args=(run_list, GG)))
+ #               link_ids_result.append(pool.apply(BatchedLinkGenerator.run, args=(run_list, GG)))
 
-            pool.close()
+ #           pool.close()
             
-            self.graph = GG
+ #           self.graph = GG
             
             return LinkSequence(
                 self.sample_features,
                 self.batch_size,
-                link_ids_result,
+                link_ids,
                 targets=targets,
                 shuffle=shuffle,
                 seed=seed,
