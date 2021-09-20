@@ -167,13 +167,13 @@ class BatchedLinkGenerator(Generator):
                       
             GG=self.graph
             
-            pool = mp.Pool(mp.cpu_count())
+            pool = mp.Pool(32)
             link_ids_result=[]
             
-            for i in range(0,len(link_ids), mp.cpu_count()):
+            for i in range(0,len(link_ids), 32):
                 
-                if (i+mp.cpu_count())<len(link_ids):
-                    sub_list=link_ids[i: (i+mp.cpu_count())]
+                if (i+32)<len(link_ids):
+                    sub_list=link_ids[i: (i+32)]
                 else:
                     sub_list=link_ids[i: len(link_ids)]
             
