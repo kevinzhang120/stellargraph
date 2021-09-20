@@ -166,6 +166,8 @@ class BatchedLinkGenerator(Generator):
 
     #        link_ids = [self.graph.node_ids_to_ilocs(ids) for ids in link_ids]
                       
+            self.__class__.GG=self.graph
+            
             pool = mp.Pool(mp.cpu_count())
 
             link_ids = pool.map(BatchedLinkGenerator.run, link_ids)
