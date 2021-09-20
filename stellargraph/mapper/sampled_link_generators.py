@@ -27,6 +27,7 @@ __all__ = [
     "DirectedGraphSAGELinkGenerator",
 ]
 
+import multiprocess as mp
 import random
 import operator
 import numpy as np
@@ -55,7 +56,8 @@ class BatchedLinkGenerator(Generator):
     def __init__(self, G, batch_size, schema=None, use_node_features=True):
         if not isinstance(G, StellarGraph):
             raise TypeError("Graph must be a StellarGraph or StellarDiGraph object.")
-
+        
+       
         self.graph = G
         self.batch_size = batch_size
 
@@ -156,7 +158,17 @@ class BatchedLinkGenerator(Generator):
                         f"Node pair ({src}, {dst}) not of expected type ({expected_src_type}, {expected_dst_type})"
                     )
 
-            link_ids = [self.graph.node_ids_to_ilocs(ids) for ids in link_ids]
+    #        link_ids = [self.graph.node_ids_to_ilocs(ids) for ids in link_ids]
+        
+            para_list=[]
+            for i in np.arange(len(link_ids)):
+                para_list.append((self.graph, link_ids[i]))
+                
+            pool = mp.Pool(mp.cpu_count())
+
+            link_ids = pool.map(BatchedLinkGenerator.run, para_list)
+
+            pool.close()
 
             return LinkSequence(
                 self.sample_features,
@@ -173,6 +185,10 @@ class BatchedLinkGenerator(Generator):
                 "Please pass a list of samples or a UnsupervisedSampler object."
             )
 
+    @staticmethod        
+    def run(a, b):
+        return a.node_ids_to_ilocs(b)
+    
     def flow_from_dataframe(self, link_targets, shuffle=False):
         """
         Creates a generator/sequence object for training or evaluation
