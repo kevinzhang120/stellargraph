@@ -167,9 +167,14 @@ class BatchedLinkGenerator(Generator):
                       
             GG=self.graph
             
+            GG_list=[]
+            
+            for i in np.arange(len(link_ids)):
+                GG_list.append((GG, link_ids[i]))
+            
             pool = mp.Pool(mp.cpu_count())
 
-            link_ids = pool.map(BatchedLinkGenerator.run, link_ids)
+            link_ids = pool.map(BatchedLinkGenerator.run, GG_list)
 
             pool.close()
             
@@ -192,7 +197,7 @@ class BatchedLinkGenerator(Generator):
 
     @staticmethod
     def run(b):
-        return GG.node_ids_to_ilocs(b)
+        return b[0].node_ids_to_ilocs(b[1])
         
     def flow_from_dataframe(self, link_targets, shuffle=False):
         """
