@@ -62,7 +62,7 @@ class BatchedLinkGenerator(Generator):
             raise TypeError("Graph must be a StellarGraph or StellarDiGraph object.")
                
         self.graph = G
-        self.__class__.GG=G
+        GG=G
         self.batch_size = batch_size
 
         # This is a link generator and requries a model with two root nodes per query
