@@ -168,7 +168,7 @@ class BatchedLinkGenerator(Generator):
 
             pool.close()
             
-         #   self.graph = BatchedLinkGenerator.GG
+            self.graph = self.__class__.GG
             
             return LinkSequence(
                 self.sample_features,
@@ -185,10 +185,9 @@ class BatchedLinkGenerator(Generator):
                 "Please pass a list of samples or a UnsupervisedSampler object."
             )
 
-    @staticmethod        
-    def run(b):
-        return BatchedLinkGenerator.GG.node_ids_to_ilocs(b)
-
+    @classmethod
+    def run(cls, b):
+        return cls.GG.node_ids_to_ilocs(b)
         
     def flow_from_dataframe(self, link_targets, shuffle=False):
         """
