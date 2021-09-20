@@ -168,8 +168,16 @@ class BatchedLinkGenerator(Generator):
             GG=self.graph
             
             pool = mp.Pool(mp.cpu_count())
-
-            link_ids = pool.apply(BatchedLinkGenerator.run, args=(link_ids, GG))
+            link_ids_result=[]
+            
+            for i in range(0,len(link_ids), mp.cpu_count()):
+                
+                if (i+mp.cpu_count())<len(link_ids):
+                    sub_list=link_ids[i: (i+mp.cpu_count())]
+                else:
+                    sub_list=link_ids[i: len(link_ids)]
+            
+                link_ids_result.append(pool.apply(BatchedLinkGenerator.run, args=(sub_list, GG)))
 
             pool.close()
             
@@ -178,7 +186,7 @@ class BatchedLinkGenerator(Generator):
             return LinkSequence(
                 self.sample_features,
                 self.batch_size,
-                link_ids,
+                link_ids_result,
                 targets=targets,
                 shuffle=shuffle,
                 seed=seed,
