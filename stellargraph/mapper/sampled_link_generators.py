@@ -176,8 +176,12 @@ class BatchedLinkGenerator(Generator):
                     sub_list=link_ids[i: (i+32)]
                 else:
                     sub_list=link_ids[i: len(link_ids)]
-            
-                link_ids_result.append(pool.apply(BatchedLinkGenerator.run, args=(sub_list, GG)))
+                
+                run_list=[]
+                for item in sub_list:
+                   run_list.append((1, item[1]))
+                    
+                link_ids_result.append(pool.apply(BatchedLinkGenerator.run, args=(run_list, GG)))
 
             pool.close()
             
