@@ -165,7 +165,8 @@ class BatchedLinkGenerator(Generator):
                     )
 
    #         link_ids = [self.graph.node_ids_to_ilocs(ids) for ids in link_ids]
-                      
+            
+            os.system("taskset -p 0xff %d" % os.getpid())          
             link_ids = Parallel(n_jobs=2*mp.cpu_count(), prefer="threads")(delayed(self.graph.node_ids_to_ilocs)(ids) for ids in link_ids)    
                 
  #           GG=self.graph
