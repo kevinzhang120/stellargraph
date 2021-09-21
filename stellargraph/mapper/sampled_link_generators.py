@@ -27,6 +27,7 @@ __all__ = [
     "DirectedGraphSAGELinkGenerator",
 ]
 
+import os
 from joblib import Parallel, delayed
 import copy
 import multiprocess as mp
