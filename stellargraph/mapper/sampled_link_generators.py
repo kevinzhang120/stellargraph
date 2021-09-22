@@ -28,6 +28,7 @@ __all__ = [
 ]
 
 
+from jug.task import Task
 from pathos.multiprocessing import ProcessingPool as Pool
 import os
 from joblib import Parallel, delayed
@@ -169,12 +170,15 @@ class BatchedLinkGenerator(Generator):
 
    #         link_ids = [self.graph.node_ids_to_ilocs(ids) for ids in link_ids]
             
-  #          p = Pool(mp.cpu_count())
+            p = Pool(mp.cpu_count())
     
-  #          link_ids = p.map(self.graph.node_ids_to_ilocs, link_ids)
+            link_ids = p.map(self.graph.node_ids_to_ilocs, list(link_ids))
     
-            os.system("taskset -p 0xff %d" % os.getpid())          
-            link_ids = Parallel(n_jobs=2*mp.cpu_count(), prefer="threads")(delayed(self.graph.node_ids_to_ilocs)(ids) for ids in link_ids)    
+   #         os.system("taskset -p 0xff %d" % os.getpid())          
+        
+   #         link_ids = [Task(self.graph.node_ids_to_ilocs,d) for d in link_ids]
+            
+  #          link_ids = Parallel(n_jobs=2*mp.cpu_count(), prefer="threads")(delayed(self.graph.node_ids_to_ilocs)(ids) for ids in link_ids)    
                 
  #           GG=self.graph
             
