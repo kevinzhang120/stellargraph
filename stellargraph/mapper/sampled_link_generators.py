@@ -29,12 +29,12 @@ __all__ = [
 
 
 from numba import jit, prange
-from jug.task import Task
-from pathos.multiprocessing import ProcessingPool as Pool
+#from jug.task import Task
+#from pathos.multiprocessing import ProcessingPool as Pool
 import os
-from joblib import Parallel, delayed
-import copy
-import multiprocess as mp
+#from joblib import Parallel, delayed
+#import copy
+#import multiprocess as mp
 import random
 import operator
 import numpy as np
