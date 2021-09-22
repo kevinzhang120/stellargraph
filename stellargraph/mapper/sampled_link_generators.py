@@ -223,11 +223,11 @@ class BatchedLinkGenerator(Generator):
             )
     
     
-    @jit(parallel=True)
+    @jit(parallel=True, fastmath=True)
     def run(self, link_ids):
         link_ids_1=[]
-        for ids in link_ids:
-            link_ids_1.append(self.graph.node_ids_to_ilocs(ids))
+        for i in prange(0, len(link_ids)):
+            link_ids_1.append(self.graph.node_ids_to_ilocs(link_ids[i]))
         return link_ids_1
         
     def flow_from_dataframe(self, link_targets, shuffle=False):
