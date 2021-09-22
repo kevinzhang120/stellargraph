@@ -223,7 +223,7 @@ class BatchedLinkGenerator(Generator):
             )
     
     
-    @jit(parallel=True, fastmath=True)
+    @jit('void(double[:], double[:])', nogil=True)
     def run(self, link_ids):
         link_ids_1=[]
         for i in prange(0, len(link_ids)):
