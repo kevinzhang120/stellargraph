@@ -99,7 +99,7 @@ class BatchedLinkGenerator(Generator):
         return 1
     
     
-    @jit(parallel=True)
+    
     def flow(self, link_ids, targets=None, shuffle=False, seed=None):
         """
         Creates a generator/sequence object for training or evaluation
@@ -173,9 +173,7 @@ class BatchedLinkGenerator(Generator):
 
    #         link_ids = [self.graph.node_ids_to_ilocs(ids) for ids in link_ids]
             
-            link_ids_1=[]
-            for ids in link_ids:
-                link_ids_1.append(self.graph.node_ids_to_ilocs(ids))
+            link_ids = self.run(link_ids)
             
    #         p = Pool(mp.cpu_count())
     
@@ -212,7 +210,7 @@ class BatchedLinkGenerator(Generator):
             return LinkSequence(
                 self.sample_features,
                 self.batch_size,
-                link_ids_1,
+                link_ids,
                 targets=targets,
                 shuffle=shuffle,
                 seed=seed,
@@ -223,7 +221,14 @@ class BatchedLinkGenerator(Generator):
                 "Argument to .flow not recognised. "
                 "Please pass a list of samples or a UnsupervisedSampler object."
             )
-
+    
+    
+    @jit(parallel=True)
+    def run(self, link_ids):
+        link_ids_1=[]
+        for ids in link_ids:
+            link_ids_1.append(self.graph.node_ids_to_ilocs(ids))
+        return link_ids_1
         
     def flow_from_dataframe(self, link_targets, shuffle=False):
         """
