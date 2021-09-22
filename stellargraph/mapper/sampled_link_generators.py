@@ -173,7 +173,7 @@ class BatchedLinkGenerator(Generator):
 
    #         link_ids = [self.graph.node_ids_to_ilocs(ids) for ids in link_ids]
             
-            link_ids=run(link_ids)
+            link_ids=self.run(link_ids)
             
             
    #         p = Pool(mp.cpu_count())
