@@ -28,6 +28,7 @@ __all__ = [
 ]
 
 
+from numba import jit, prange
 from jug.task import Task
 from pathos.multiprocessing import ProcessingPool as Pool
 import os
@@ -96,7 +97,9 @@ class BatchedLinkGenerator(Generator):
 
     def num_batch_dims(self):
         return 1
-
+    
+    
+    
     def flow(self, link_ids, targets=None, shuffle=False, seed=None):
         """
         Creates a generator/sequence object for training or evaluation
@@ -170,15 +173,18 @@ class BatchedLinkGenerator(Generator):
 
    #         link_ids = [self.graph.node_ids_to_ilocs(ids) for ids in link_ids]
             
+            link_ids=run(link_ids)
+            
+            
    #         p = Pool(mp.cpu_count())
     
    #         link_ids = p.map(self.graph.node_ids_to_ilocs, list(link_ids))
     
-            os.system("taskset -p 0xff %d" % os.getpid())          
+   #         os.system("taskset -p 0xff %d" % os.getpid())          
         
    #         link_ids = [Task(self.graph.node_ids_to_ilocs,d) for d in link_ids]
             
-            link_ids = Parallel(n_jobs=mp.cpu_count(), prefer="threads")(delayed(self.graph.node_ids_to_ilocs)(ids) for ids in link_ids)    
+   #         link_ids = Parallel(n_jobs=mp.cpu_count(), prefer="threads")(delayed(self.graph.node_ids_to_ilocs)(ids) for ids in link_ids)    
                 
  #           GG=self.graph
             
@@ -217,9 +223,12 @@ class BatchedLinkGenerator(Generator):
                 "Please pass a list of samples or a UnsupervisedSampler object."
             )
 
-    @staticmethod
-    def run(b, c):
-        return c.node_ids_to_ilocs(b)
+    @jit(parallel=True)
+    def run(self, link_ids):
+        link_ids_1=[]
+        for ids in link_ids:
+            link_ids_1.append(self.graph.node_ids_to_ilocs(ids))
+        return link_ids_1
         
     def flow_from_dataframe(self, link_targets, shuffle=False):
         """
