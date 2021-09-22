@@ -223,7 +223,7 @@ class BatchedLinkGenerator(Generator):
                 "Please pass a list of samples or a UnsupervisedSampler object."
             )
 
-    @jit(parallel=True)
+    @jit(nopython=True, parallel=True)
     def run(self, link_ids):
         link_ids_1=[]
         for ids in link_ids:
