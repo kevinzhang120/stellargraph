@@ -188,7 +188,7 @@ class BatchedLinkGenerator(Generator):
    #         link_ids = self.run(link_ids)
             
             p = mp.Pool(2)
-            link_ids=[p.map(func, args=(ids, link_ids)) for ids in link_ids]
+            link_ids=[p.apply(func, args=(ids, link_ids)) for ids in link_ids]
             
    #         for i in range(0, len(link_ids), 2):            
    #             link_ids_1.append(p.map(self.graph.node_ids_to_ilocs, link_ids[i:np.min([i+2, len(link_ids)])]))
