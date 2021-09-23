@@ -28,6 +28,7 @@ __all__ = [
 ]
 
 
+import networkx
 import pandas as pd
 from numba import jit, prange
 #from jug.task import Task
@@ -66,6 +67,35 @@ def unwrap_self_f(arg, **kwarg):
 
 def func(ids, abc):  
     return abc.get_indexer(ids)
+
+def processing(nodes):
+    if isinstance(nodes, networkx.Graph):
+        # `StellarGraph(nx_graph)` -> `graph`
+        graph = nodes
+        nodes = None
+    
+        nodes, edges = convert.from_networkx(
+            graph,
+            node_type_attr=globalvar.TYPE_ATTR_NAME,
+            edge_type_attr=globalvar.TYPE_ATTR_NAME,
+            node_type_default=globalvar.NODE_TYPE_DEFAULT,
+            edge_type_default=globalvar.EDGE_TYPE_DEFAULT,
+            edge_weight_attr=globalvar.WEIGHT,
+            node_features=None,
+            dtype="float32",
+        )
+
+    nodes_is_internal = isinstance(nodes, NodeData)
+    edges_is_internal = isinstance(edges, EdgeData)
+    any_internal = nodes_is_internal or edges_is_internal
+
+    if not any_internal:
+        internal_nodes = convert.convert_nodes(
+            nodes, name="nodes", default_type=globalvar.NODE_TYPE_DEFAULT, dtype="float32",
+        )
+    
+    return internal_nodes
+        
 
 
 class BatchedLinkGenerator(Generator):
@@ -188,7 +218,10 @@ class BatchedLinkGenerator(Generator):
 
             
    #         abc = pd.Index(self.graph._nodes.ids.to_iloc(link_ids)).drop_duplicates(keep='first')
-                    
+            
+    
+            nodes = processing(nodes)
+        
             p = mp.Pool(10)
             
             link_ids=p.map(nodes.ids.to_iloc, link_ids)
