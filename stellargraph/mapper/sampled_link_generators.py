@@ -180,12 +180,13 @@ class BatchedLinkGenerator(Generator):
             
    #         link_ids = self.run(link_ids)
             
-            p = mp.Pool(1)
-    
-            link_ids = p.map(self.graph.node_ids_to_ilocs, link_ids)
+            link_ids_1=[]
+            p = mp.Pool(2)
+            
+            for i in range(0, len(link_ids), 2):            
+                link_ids_1.append(p.map(self.graph.node_ids_to_ilocs, link_ids[i:np.min([i+2, len(link_ids)])]))
         
             p.close()
-            p.join()
     
    #         os.system("taskset -p 0xff %d" % os.getpid())          
         
@@ -218,7 +219,7 @@ class BatchedLinkGenerator(Generator):
             return LinkSequence(
                 self.sample_features,
                 self.batch_size,
-                link_ids,
+                link_ids_1,
                 targets=targets,
                 shuffle=shuffle,
                 seed=seed,
