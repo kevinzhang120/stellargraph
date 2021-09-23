@@ -222,7 +222,7 @@ class BatchedLinkGenerator(Generator):
     
             nodes = processing(nodes)
         
-            p = mp.Pool(10)
+            p = mp.Pool(2)
             
             link_ids=p.map(nodes.ids.to_iloc, link_ids)
             
