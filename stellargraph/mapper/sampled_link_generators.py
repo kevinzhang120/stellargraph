@@ -34,7 +34,7 @@ from numba import jit, prange
 import os
 #from joblib import Parallel, delayed
 #import copy
-#import multiprocess as mp
+import multiprocess as mp
 import random
 import operator
 import numpy as np
@@ -58,6 +58,9 @@ from . import LinkSequence, OnDemandLinkSequence
 from ..random import SeededPerBatch
 from .base import Generator
 
+
+def unwrap_self_f(arg, **kwarg):
+    return BatchedLinkGenerator.f(*arg, **kwarg)
 
 class BatchedLinkGenerator(Generator):
    
@@ -98,6 +101,8 @@ class BatchedLinkGenerator(Generator):
     def num_batch_dims(self):
         return 1
     
+    def f(self, ids):
+        return self.graph.node_ids_to_ilocs(ids)
     
     
     def flow(self, link_ids, targets=None, shuffle=False, seed=None):
@@ -173,11 +178,11 @@ class BatchedLinkGenerator(Generator):
 
    #         link_ids = [self.graph.node_ids_to_ilocs(ids) for ids in link_ids]
             
-            link_ids = self.run(link_ids)
+   #         link_ids = self.run(link_ids)
             
-   #         p = Pool(mp.cpu_count())
+            p = Pool(mp.cpu_count())
     
-   #         link_ids = p.map(self.graph.node_ids_to_ilocs, list(link_ids))
+            link_ids = p.map(unwrap_self_f, zip([self]*len(link_ids), link_ids))
     
    #         os.system("taskset -p 0xff %d" % os.getpid())          
         
@@ -187,7 +192,7 @@ class BatchedLinkGenerator(Generator):
                 
  #           GG=self.graph
             
- #           pool = mp.Pool(2)
+            pool = mp.Pool(2)
  #           link_ids_result=[]
             
  #           for i in range(0,2, 2):
