@@ -78,7 +78,7 @@ class ExternalIdIndex:
 
             raise KeyError(missing_values)
 
-    def to_iloc(self, ids, smaller_type=True, strict=False) -> np.ndarray:
+        def to_iloc(self, ids, smaller_type=True, strict=True) -> np.ndarray:
         """
         Convert external IDs ``ids`` to integer locations.
 
