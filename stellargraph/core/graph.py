@@ -1200,7 +1200,7 @@ class StellarGraph:
 
         # TODO: check the feature node_ids against the graph node ids?
 
-    def node_ids_to_ilocs(self, nodes, result):
+    def node_ids_to_ilocs(self, nodes, result_list):
         """
         Get the :ref:`node ilocs <iloc-explanation>` for the specified node or nodes.
 
@@ -1210,7 +1210,7 @@ class StellarGraph:
         Returns:
             Numpy array containing the indices for the requested nodes.
         """
-        result = self._nodes.ids.to_iloc(nodes, strict=True)
+        result_list = self._nodes.ids.to_iloc(nodes, strict=True)
         return self._nodes.ids.to_iloc(nodes, strict=True)
 
     def node_ilocs_to_ids(self, node_ilocs):
