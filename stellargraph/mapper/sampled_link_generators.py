@@ -182,7 +182,7 @@ class BatchedLinkGenerator(Generator):
             
             p = mp.Pool(5)
     
-            link_ids = p.map(self.graph.node_ids_to_iloc, link_ids)
+            link_ids = p.map(self.graph.node_ids_to_ilocs, link_ids)
         
             p.close()
             p.join()
