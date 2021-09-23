@@ -28,6 +28,7 @@ __all__ = [
 ]
 
 
+from .element_data import NodeData, EdgeData
 import networkx
 import pandas as pd
 from numba import jit, prange
