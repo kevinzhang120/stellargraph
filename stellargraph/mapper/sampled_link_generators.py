@@ -182,7 +182,7 @@ class BatchedLinkGenerator(Generator):
             
             p = mp.Pool(mp.cpu_count())
     
-            link_ids = list(p.starmap(BatchedLinkGenerator.f, zip(it.repeat(self), link_ids)))
+            link_ids = list(p.map(unwrap_self_f, zip([self]*len(link_ids), link_ids)))
     
    #         os.system("taskset -p 0xff %d" % os.getpid())          
         
