@@ -28,6 +28,7 @@ __all__ = [
 ]
 
 
+import pandas as pd
 from numba import jit, prange
 #from jug.task import Task
 #from pathos.multiprocessing import ProcessingPool as Pool
