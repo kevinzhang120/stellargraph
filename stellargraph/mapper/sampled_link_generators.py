@@ -187,7 +187,7 @@ class BatchedLinkGenerator(Generator):
             
    #         link_ids = self.run(link_ids)
             
-            p = mp.Pool(2)
+            p = mp.Pool(10)
             link_ids=[p.apply(func, args=(ids, link_ids, self.graph)) for ids in link_ids]
             
    #         for i in range(0, len(link_ids), 2):            
