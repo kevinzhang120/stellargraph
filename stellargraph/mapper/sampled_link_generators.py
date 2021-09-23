@@ -1,5 +1,3 @@
-%%script Python-3.9.7/python
-
 # -*- coding: utf-8 -*-
 #
 # Copyright 2018-2020 Data61, CSIRO
