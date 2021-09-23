@@ -28,6 +28,7 @@ __all__ = [
 ]
 
 
+from multiprocess import Process, Queue
 from stellargraph.core.element_data import NodeData, EdgeData
 import networkx
 import pandas as pd
@@ -66,37 +67,9 @@ def unwrap_self_f(arg, **kwarg):
     return BatchedLinkGenerator.f(*arg, **kwarg)
 
 
-def func(ids, abc):  
-    return abc.get_indexer(ids)
-
-def processing(nodes):
-    if isinstance(nodes, networkx.Graph):
-        # `StellarGraph(nx_graph)` -> `graph`
-        graph = nodes
-        nodes = None
-    
-        nodes, edges = convert.from_networkx(
-            graph,
-            node_type_attr=globalvar.TYPE_ATTR_NAME,
-            edge_type_attr=globalvar.TYPE_ATTR_NAME,
-            node_type_default=globalvar.NODE_TYPE_DEFAULT,
-            edge_type_default=globalvar.EDGE_TYPE_DEFAULT,
-            edge_weight_attr=globalvar.WEIGHT,
-            node_features=None,
-            dtype="float32",
-        )
-
-    nodes_is_internal = isinstance(nodes, NodeData)
-    edges_is_internal = isinstance(edges, EdgeData)
-    any_internal = nodes_is_internal or edges_is_internal
-
-    if not any_internal:
-        internal_nodes = convert.convert_nodes(
-            nodes, name="nodes", default_type=globalvar.NODE_TYPE_DEFAULT, dtype="float32",
-        )
-    
-    return internal_nodes
-        
+def func(link_ids, q): 
+    q.put([q.get().node_ids_to_ilocs(ids) for ids in link_ids])
+      
 
 
 class BatchedLinkGenerator(Generator):
@@ -142,7 +115,7 @@ class BatchedLinkGenerator(Generator):
         return self.graph.node_ids_to_ilocs(ids)
     
     
-    def flow(self, link_ids, nodes, targets=None, shuffle=False, seed=None):
+    def flow(self, link_ids, targets=None, shuffle=False, seed=None):
         """
         Creates a generator/sequence object for training or evaluation
         with the supplied node ids and numeric targets.
@@ -221,16 +194,42 @@ class BatchedLinkGenerator(Generator):
    #         abc = pd.Index(self.graph._nodes.ids.to_iloc(link_ids)).drop_duplicates(keep='first')
             
     
-            nodes = processing(nodes)
+  #          nodes = processing(nodes)
         
-            p = mp.Pool(2)
+  #          p = mp.Pool(2)
+            q1 = Queue()
+            q1.put(self.graph)
             
-            link_ids=p.map(nodes.ids.to_iloc, link_ids)
+            p1 = Process(target=func, args=(link_ids[0:len(link_ids)/2], q1))
+            p1.start()
+            
+            q2 = Queue()
+            q2.put(self.graph)
+            
+            p2 = Process(target=func, args=(link_ids[len(link_ids)/2 : len(link_ids)], q2))
+            p2.start()
+            
+            p1.join()
+            p2.join()
+            
+            a=q1.get()
+            b=q2.get()
+            result=[]
+            while True:
+                result.append(q1.get())
+                if item is None:  
+                    break
+            while True:
+                result.append(q2.get())
+                if item is None:  
+                    break
+                    
+   #         link_ids=p.map(self.graph.node_ids_to_ilocs, link_ids)
             
    #         for i in range(0, len(link_ids), 2):            
    #             link_ids_1.append(p.map(self.graph.node_ids_to_ilocs, link_ids[i:np.min([i+2, len(link_ids)])]))
         
-            p.close()
+    #        p.close()
     
    #         os.system("taskset -p 0xff %d" % os.getpid())          
         
@@ -263,7 +262,7 @@ class BatchedLinkGenerator(Generator):
             return LinkSequence(
                 self.sample_features,
                 self.batch_size,
-                link_ids,
+                result,
                 targets=targets,
                 shuffle=shuffle,
                 seed=seed,
