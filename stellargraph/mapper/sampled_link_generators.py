@@ -186,8 +186,8 @@ class BatchedLinkGenerator(Generator):
             
    #         link_ids = self.run(link_ids)
             
-            abc = pd.Index(self.graph._nodes.ids.to_iloc(link_ids))
-            
+            abc = pd.Index(self.graph._nodes.ids.to_iloc(link_ids)).drop_duplicates(keep='first')
+                    
             p = mp.Pool(10)
             
             link_ids=[p.apply(func, args=(ids, abc)) for ids in link_ids]
