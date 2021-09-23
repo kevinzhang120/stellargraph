@@ -111,7 +111,7 @@ class BatchedLinkGenerator(Generator):
         return self.graph.node_ids_to_ilocs(ids)
     
     
-    def flow(self, link_ids, targets=None, shuffle=False, seed=None):
+    def flow(self, link_ids, targets=None, shuffle=False, seed=None, nodes):
         """
         Creates a generator/sequence object for training or evaluation
         with the supplied node ids and numeric targets.
@@ -185,12 +185,13 @@ class BatchedLinkGenerator(Generator):
    #         link_ids = [self.graph.node_ids_to_ilocs(ids) for ids in link_ids]
             
    #         link_ids = self.run(link_ids)
+
             
-            abc = pd.Index(self.graph._nodes.ids.to_iloc(link_ids)).drop_duplicates(keep='first')
+   #         abc = pd.Index(self.graph._nodes.ids.to_iloc(link_ids)).drop_duplicates(keep='first')
                     
             p = mp.Pool(10)
             
-            link_ids=[p.apply(func, args=(ids, abc)) for ids in link_ids]
+            link_ids=p.map(nodes.ids.to_iloc, link_ids)
             
    #         for i in range(0, len(link_ids), 2):            
    #             link_ids_1.append(p.map(self.graph.node_ids_to_ilocs, link_ids[i:np.min([i+2, len(link_ids)])]))
