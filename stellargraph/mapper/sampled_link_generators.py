@@ -62,6 +62,12 @@ from .base import Generator
 def unwrap_self_f(arg, **kwarg):
     return BatchedLinkGenerator.f(*arg, **kwarg)
 
+
+def func(ids):
+    internal_ids = pd.Index(ids).get_indexer(ids)
+    return internal_ids.astype(self.dtype)
+
+
 class BatchedLinkGenerator(Generator):
    
     GG=None
@@ -180,11 +186,11 @@ class BatchedLinkGenerator(Generator):
             
    #         link_ids = self.run(link_ids)
             
-            link_ids_1=[]
             p = mp.Pool(2)
+            link_ids=p.map(func, link_ids)
             
-            for i in range(0, len(link_ids), 2):            
-                link_ids_1.append(p.map(self.graph.node_ids_to_ilocs, link_ids[i:np.min([i+2, len(link_ids)])]))
+   #         for i in range(0, len(link_ids), 2):            
+   #             link_ids_1.append(p.map(self.graph.node_ids_to_ilocs, link_ids[i:np.min([i+2, len(link_ids)])]))
         
             p.close()
     
@@ -219,7 +225,7 @@ class BatchedLinkGenerator(Generator):
             return LinkSequence(
                 self.sample_features,
                 self.batch_size,
-                link_ids_1,
+                link_ids,
                 targets=targets,
                 shuffle=shuffle,
                 seed=seed,
