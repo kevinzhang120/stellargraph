@@ -64,10 +64,9 @@ def unwrap_self_f(arg, **kwarg):
     return BatchedLinkGenerator.f(*arg, **kwarg)
 
 
-def func(ids, nodes):   
-    idx = pd.Index(nodes)
-    internal_ids = idx.get_indexer(ids)
-    return internal_ids.astype(np.min_scalar_type(len(idx)))
+def func(ids, link_ids, G):  
+    node_ilocs = G._nodes.ids.to_iloc(link_ids)
+    return pd.Index(node_ilocs).get_indexer(ids)
 
 
 class BatchedLinkGenerator(Generator):
@@ -113,7 +112,7 @@ class BatchedLinkGenerator(Generator):
         return self.graph.node_ids_to_ilocs(ids)
     
     
-    def flow(self, link_ids, targets=None, shuffle=False, seed=None):
+    def flow(self, link_ids, targets=None, shuffle=False, seed=None, nodes):
         """
         Creates a generator/sequence object for training or evaluation
         with the supplied node ids and numeric targets.
@@ -189,7 +188,7 @@ class BatchedLinkGenerator(Generator):
    #         link_ids = self.run(link_ids)
             
             p = mp.Pool(2)
-            link_ids=[p.apply(func, args=(ids, link_ids)) for ids in link_ids]
+            link_ids=[p.apply(func, args=(ids, link_ids, G)) for ids in link_ids]
             
    #         for i in range(0, len(link_ids), 2):            
    #             link_ids_1.append(p.map(self.graph.node_ids_to_ilocs, link_ids[i:np.min([i+2, len(link_ids)])]))
