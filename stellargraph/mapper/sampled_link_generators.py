@@ -111,7 +111,7 @@ class BatchedLinkGenerator(Generator):
         return self.graph.node_ids_to_ilocs(ids)
     
     
-    def flow(self, link_ids, targets=None, shuffle=False, seed=None, nodes):
+    def flow(self, link_ids, nodes, targets=None, shuffle=False, seed=None):
         """
         Creates a generator/sequence object for training or evaluation
         with the supplied node ids and numeric targets.
