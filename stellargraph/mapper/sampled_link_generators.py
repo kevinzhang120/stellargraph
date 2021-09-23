@@ -64,9 +64,8 @@ def unwrap_self_f(arg, **kwarg):
     return BatchedLinkGenerator.f(*arg, **kwarg)
 
 
-def func(ids, link_ids, G):  
-    node_ilocs = G._nodes.ids.to_iloc(link_ids)
-    return pd.Index(node_ilocs).get_indexer(ids)
+def func(ids, abc):  
+    return abc.get_indexer(ids)
 
 
 class BatchedLinkGenerator(Generator):
@@ -187,8 +186,11 @@ class BatchedLinkGenerator(Generator):
             
    #         link_ids = self.run(link_ids)
             
+            abc = pd.Index(self.graph._nodes.ids.to_iloc(link_ids))
+            
             p = mp.Pool(10)
-            link_ids=[p.apply(func, args=(ids, link_ids, self.graph)) for ids in link_ids]
+            
+            link_ids=[p.apply(func, args=(ids, abc)) for ids in link_ids]
             
    #         for i in range(0, len(link_ids), 2):            
    #             link_ids_1.append(p.map(self.graph.node_ids_to_ilocs, link_ids[i:np.min([i+2, len(link_ids)])]))
