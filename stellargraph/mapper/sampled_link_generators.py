@@ -64,9 +64,8 @@ def unwrap_self_f(arg, **kwarg):
     return BatchedLinkGenerator.f(*arg, **kwarg)
 
 
-def func(ids, nodes):
-    internal_ids = pd.Index(nodes).get_indexer(ids)
-    return internal_ids.astype(self.dtype)
+def func(ids, nodes):     
+    return pd.Index(nodes).get_indexer(ids)
 
 
 class BatchedLinkGenerator(Generator):
