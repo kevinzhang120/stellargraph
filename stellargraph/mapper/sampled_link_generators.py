@@ -180,7 +180,7 @@ class BatchedLinkGenerator(Generator):
             
    #         link_ids = self.run(link_ids)
             
-            p = mp.Pool(5)
+            p = mp.Pool(1)
     
             link_ids = p.map(self.graph.node_ids_to_ilocs, link_ids)
         
