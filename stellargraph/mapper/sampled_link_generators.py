@@ -28,6 +28,7 @@ __all__ = [
 ]
 
 
+import math
 from multiprocess import Process, Queue
 from stellargraph.core.element_data import NodeData, EdgeData
 import networkx
@@ -68,7 +69,8 @@ def unwrap_self_f(arg, **kwarg):
 
 
 def func(link_ids, q): 
-    q.put([q.get().node_ids_to_ilocs(ids) for ids in link_ids])
+    g = q.get()
+    q.put([g.node_ids_to_ilocs(ids) for ids in link_ids])
       
 
 
@@ -197,32 +199,25 @@ class BatchedLinkGenerator(Generator):
   #          nodes = processing(nodes)
         
   #          p = mp.Pool(2)
-            q1 = Queue()
-            q1.put(self.graph)
+            q = Queue()
+            q.put(self.graph)
             
-            p1 = Process(target=func, args=(link_ids[0:len(link_ids)/2], q1))
+            p1 = Process(target=func, args=(link_ids[0:math.floor(len(link_ids)/2)], q))
             p1.start()
             
-            q2 = Queue()
-            q2.put(self.graph)
-            
-            p2 = Process(target=func, args=(link_ids[len(link_ids)/2 : len(link_ids)], q2))
+            p2 = Process(target=func, args=(link_ids[math.ceil(len(link_ids)/2) : len(link_ids)], q))
             p2.start()
             
             p1.join()
             p2.join()
             
-            a=q1.get()
-            b=q2.get()
+   #         a=q.get()
             result=[]
             while True:
-                result.append(q1.get())
+                result.append(q.get())
                 if item is None:  
                     break
-            while True:
-                result.append(q2.get())
-                if item is None:  
-                    break
+            
                     
    #         link_ids=p.map(self.graph.node_ids_to_ilocs, link_ids)
             
