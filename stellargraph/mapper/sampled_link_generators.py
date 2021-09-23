@@ -180,9 +180,12 @@ class BatchedLinkGenerator(Generator):
             
    #         link_ids = self.run(link_ids)
             
-            p = mp.Pool(mp.cpu_count())
+            p = mp.Pool(5)
     
-            link_ids = list(p.map(unwrap_self_f, zip([self]*len(link_ids), link_ids)))
+            link_ids = p.map(self.graph.node_ids_to_iloc, link_ids)
+        
+            p.close()
+            p.join()
     
    #         os.system("taskset -p 0xff %d" % os.getpid())          
         
@@ -208,7 +211,7 @@ class BatchedLinkGenerator(Generator):
                     
  #               link_ids_result.append(pool.apply(BatchedLinkGenerator.run, args=(run_list, GG)))
 
-            pool.close()
+            
             
  #           self.graph = GG
             
